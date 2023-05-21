@@ -1,25 +1,7 @@
-import { createHash } from 'node:crypto'
-
 import { createGetInitialProps } from '@mantine/next'
 import Document, { Head, Html, Main, NextScript } from 'next/document'
 
 const getInitialProps = createGetInitialProps()
-
-const allowedConnectionDomains = [
-    // Scripts from Next.js
-    "'self'",
-    // Backend for INFO PRIDE
-    'idoly-backend.outv.im',
-    // Vercel's Analytics
-    'vitals.vercel-insights.com',
-    // Sentry's reporting & performance measurement
-    'o421264.ingest.sentry.io',
-    // Asset server
-    'ac.ip.outv.im',
-    // Asset storage
-    'idoly-assets.outv.im',
-    'res.cloudinary.com',
-]
 
 const DESCRIPTION = 'Informational site for Project IDOLY PRIDE fans.'
 const META_TITLE = `Info Pride - ${DESCRIPTION}`
@@ -27,38 +9,13 @@ const META_DESCRIPTION = 'The IDOLY PRIDE game database.'
 const BASEURL = 'https://ip.outv.im'
 const OG_IMAGE = BASEURL + '/social.png'
 
-const cspRules = (scriptOthers: string) =>
-    [
-        `script-src 'self' ${scriptOthers}`,
-        `connect-src ${allowedConnectionDomains.join(' ')}`,
-    ].join('; ')
-
-const cspHashOf = (text: string) => {
-    const hash = createHash('sha256')
-    hash.update(text)
-    return `'sha256-${hash.digest('base64')}'`
-}
-
 export default class _Document extends Document {
     static getInitialProps = getInitialProps
 
     render() {
-        const csp =
-            process.env.NODE_ENV === 'production'
-                ? cspRules(
-                      cspHashOf(NextScript.getInlineScriptSource(this.props))
-                  )
-                : cspRules(
-                      "'unsafe-eval' " +
-                          cspHashOf(
-                              NextScript.getInlineScriptSource(this.props)
-                          )
-                  )
-
         return (
             <Html>
                 <Head>
-                    <meta httpEquiv="Content-Security-Policy" content={csp} />
                     {/* opengraph */}
                     <meta property="og:title" content={META_TITLE} />
                     <meta property="twitter:title" content={META_TITLE} />

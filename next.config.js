@@ -6,10 +6,16 @@ const cp = require('node:child_process')
 const { withSentryConfig } = require('@sentry/nextjs')
 
 const locales = require('./locales/locales.json')
+const buildCspRules = require('./data/cspSites')
+
+const isProd = process.env.NODE_ENV === 'production'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
+    experimental: {
+        appDir: true,
+    },
     async headers() {
         return [
             {
@@ -18,6 +24,14 @@ const nextConfig = {
                     {
                         key: 'Permissions-Policy',
                         value: 'interest-cohert=()',
+                    },
+                    {
+                        key: 'Content-Security-Policy',
+                        value: buildCspRules(
+                            isProd
+                                ? "'unsafe-inline'"
+                                : "'unsafe-inline' 'unsafe-eval'"
+                        ),
                     },
                 ],
             },
